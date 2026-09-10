@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern char POSSIBLE;
 extern int SIZE_ROWS;
 extern int SIZE_COLUMNS;
+extern int UNSOLVED;
 
 typedef struct Box{
   struct Box * next;
@@ -15,16 +15,18 @@ typedef struct Box{
 typedef struct Square{
   int number;
 
-  // 111111111 boolean flags for possible 
-  // 987654321 1 means no possiblity
-  char code;
+  int possible[9];
+  int solvable;
   Box * box;
   int row;
   int column;
 } Square;
 
 int ** createPuzzle();
-void printPuzzle(int ** puzzle);
+void printPuzzle(Square *** puzzle);
 Square *** setUpPuzzle(int ** puzzle);
+void checkPuzzle(Square *** sudoku);
 
+void solveSquare(Square * square);
+void updateSudoku(Square *** sudoku, int row, int column);
 #endif

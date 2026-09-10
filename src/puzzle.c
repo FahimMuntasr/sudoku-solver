@@ -2,7 +2,7 @@
 
 Square *** setUpPuzzle(int ** puzzle){
   Square *** sudoku;
-  int i,j;
+  int i,j,k;
 
   sudoku = (Square***)malloc(sizeof(Square **)*9);
   
@@ -18,16 +18,54 @@ Square *** setUpPuzzle(int ** puzzle){
       
       sudoku[i][j]->row = i;
       sudoku[i][j]->column = j;
-
-      if(sudoku[i][j]->number != 0){
-        sudoku[i][j]->code = POSSIBLE;
-      }else{
-        sudoku[i][j]->code = 0x0; //000000000
+      sudoku[i][j]->solvable = 9;
+      for(k=0;k<SIZE_ROWS; k++){
+        sudoku[i][j]->possible[k] = 0;
       }
     }
   }
-  
 
+  for(i=0;i<SIZE_ROWS;i++){
+    for(j=0;j<SIZE_COLUMNS;j++){
+      if(sudoku[i][j]->number!=0){
+        sudoku[i][j]->solvable = 0;
+        updateSudoku(sudoku, i, j);
+        UNSOLVED--;
+      }
+    }
+  }
+  return sudoku;
+}
+
+void updateSudoku(Square *** sudoku, int row, int column){
+  int i, number;
+  number = sudoku[row][column]->number;
+
+  for(i=0;i<SIZE_ROWS;i++){
+    if(sudoku[i][column]->possible[number-1] == 0){
+      sudoku[i][column]->solvable--;
+    }
+    sudoku[i][column]->possible[number-1]=1; 
+  }
+  for(i=0;i<SIZE_COLUMNS;i++){
+    if(sudoku[row][i]->possible[number-1] == 0){
+      sudoku[row][i]->solvable--;
+    }
+    sudoku[row][i]->possible[number-1]=1; 
+  }
+}
+
+void checkPuzzle(Square *** sudoku){
+  int i,j,k;
+
+  for(i = 0;i < SIZE_ROWS;i++){
+    for(j = 0;j < SIZE_COLUMNS;j++){
+      if(sudoku[i][j]->solvable == 1){
+        solveSquare(sudoku[i][j]);
+        updateSudoku(sudoku, i, j);
+      }
+    }
+  }
 }
 
 int ** createPuzzle(){
@@ -60,7 +98,7 @@ int ** createPuzzle(){
   return puzzle;
 }
 
-void printPuzzle(int ** puzzle){
+void printPuzzle(Square *** puzzle){
   int i,j;
   printf("-------------------------------\n");
   for (i=0; i<SIZE_ROWS; i++){
@@ -68,7 +106,7 @@ void printPuzzle(int ** puzzle){
       if((j)%3==0){
         printf("|");
       }
-      printf(" %d ", puzzle[i][j]);
+      printf(" %d ", puzzle[i][j]->number);
     }
     if((i+1)%3==0 && i!=8){
       printf("|\n|-----------------------------");
