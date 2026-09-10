@@ -33,7 +33,6 @@ typedef struct Square{
 } Square;
 
 int ** createPuzzle();
-int ** generatePuzzle();
 void printPuzzle(Sudoku * sudoku);
 
 Sudoku * setUpPuzzle(int ** puzzle);

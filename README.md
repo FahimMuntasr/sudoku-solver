@@ -8,7 +8,6 @@ The project implements Sudoku board management, constraint tracking, puzzle gene
 ## Features
 
 * Input a Sudoku puzzle manually
-* Generate a random solvable Sudoku puzzle
 * Solve Sudoku puzzles
 * Detect when the solver cannot make further progress
 * Track possible values for each square
