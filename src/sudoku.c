@@ -16,5 +16,6 @@ int main(){
   printPuzzle(sudoku);
   checkPuzzle(sudoku);
   printPuzzle(sudoku);
+
   return 0;
 }
