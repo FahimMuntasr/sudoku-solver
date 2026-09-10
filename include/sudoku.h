@@ -36,7 +36,7 @@ void printPuzzle(Square *** puzzle);
 Sudoku * setUpPuzzle(int ** puzzle);
 Sudoku * createSudoku(Square *** puzzle, Box ** boxes);
 
-void checkPuzzle(Square *** sudoku, Box ** boxes);
+int checkPuzzle(Square *** sudoku, Box ** boxes);
 
 void solveSquare(Square * square);
 void updateSudoku(Square *** sudoku, int row, int column);

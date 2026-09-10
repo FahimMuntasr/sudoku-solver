@@ -80,7 +80,7 @@ void updateSudoku(Square *** sudoku, int row, int column){
   }
 }
 
-void checkPuzzle(Square *** sudoku, Box ** boxes){
+int checkPuzzle(Square *** sudoku, Box ** boxes){
   int i,j,k;
 
   for(i = 0;i < SIZE_ROWS;i++){
@@ -89,11 +89,13 @@ void checkPuzzle(Square *** sudoku, Box ** boxes){
         solveSquare(sudoku[i][j]);
         updateSudoku(sudoku, i, j);
         updateBoxes(sudoku, i, j);
+        
+        return 1;
       }
     }
   }
 
-  boxSingles(sudoku, boxes);
+  return boxSingles(sudoku, boxes);
 }
 
 int ** createPuzzle(){

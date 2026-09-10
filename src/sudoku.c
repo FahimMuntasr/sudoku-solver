@@ -7,6 +7,7 @@ int UNSOLVED = 81;
 int main(){
   
   int ** puzzle;
+  int progress;
   Sudoku * sudoku;
 
   puzzle = createPuzzle();
@@ -14,7 +15,13 @@ int main(){
   
   sudoku = setUpPuzzle(puzzle);
   printPuzzle(sudoku->squares);
-  checkPuzzle(sudoku->squares,sudoku->boxes);
+  while(UNSOLVED > 0){
+    progress = checkPuzzle(sudoku->squares,sudoku->boxes);
+    if(progress == 0){
+      printf("Unsolvable\n");
+      break;
+    }
+  }
   printPuzzle(sudoku->squares);
 
   return 0;
