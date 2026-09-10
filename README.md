@@ -1,20 +1,22 @@
 
 # Sudoku Solver
 
-A Sudoku solver and puzzle generator written from scratch in **C**.
+A Sudoku solver written from scratch in **C**.
 
-The project implements Sudoku board management, constraint tracking, puzzle generation, and solving using custom data structures and algorithms. The program runs through a simple command-line interface.
+The project implements Sudoku board management, constraint tracking, and a command-line interface for solving Sudoku puzzles. The solver uses custom data structures to represent individual squares, rows, columns, and 3×3 boxes.
 
 ## Features
 
-* Input a Sudoku puzzle manually
+* Input Sudoku puzzles manually
 * Solve Sudoku puzzles
 * Detect when the solver cannot make further progress
 * Track possible values for each square
 * Track 3×3 Sudoku boxes
 * Command-line interface
-* Modular C implementation using multiple source files
-* Randomized Sudoku generation using backtracking
+* Modular C implementation
+* Dynamic memory allocation
+* Makefile-based build system
+* Debian `.deb` package support
 
 ## How It Works
 
@@ -26,7 +28,7 @@ The Sudoku board is represented using custom structures:
 * `Square` — represents an individual cell
 * `Box` — represents a 3×3 box
 
-Each square keeps track of:
+Each square stores information about:
 
 * Its current number
 * Its row and column
@@ -36,25 +38,22 @@ Each square keeps track of:
 
 ### Solving
 
-The solver repeatedly looks for cells where the answer can be determined from the current constraints.
+The solver repeatedly searches for values that can be determined from the current constraints.
 
 It checks:
 
-1. Individual square possibilities
+1. Squares with only one possible value
 2. Unique candidates within a 3×3 box
 3. Unique candidates within a row
 
-When a value is found, the corresponding row, column, and box constraints are updated.
+Whenever a value is determined, the corresponding row, column, and box constraints are updated.
 
-### Puzzle Generation
+The solver continues until either:
 
-The generator first creates a complete valid Sudoku using randomized backtracking.
+* The Sudoku is completely solved, or
+* No further progress can be made using the implemented solving techniques.
 
-It then removes numbers from the completed board to create a playable puzzle.
-
-Because the puzzle starts from a valid completed Sudoku, the generated puzzle has at least one valid solution.
-
-> The generator does not guarantee that the resulting puzzle has a unique solution.
+> The solver currently uses constraint-based solving and does not implement recursive backtracking.
 
 ## Project Structure
 
@@ -69,6 +68,13 @@ sudoku-solver/
 │   ├── row.c
 │   ├── square.c
 │   └── sudoku.c
+├── packaging/
+│   └── sudoku-solver/
+│       ├── DEBIAN/
+│       │   └── control
+│       └── usr/
+│           └── bin/
+│               └── sudoku
 ├── Makefile
 └── README.md
 ```
@@ -78,14 +84,16 @@ sudoku-solver/
 * GCC
 * Make
 * ncurses
+* Debian/Ubuntu-based Linux distribution for `.deb` packaging
 
 On Ubuntu/Debian:
 
 ```bash
-sudo apt install build-essential libncurses-dev
+sudo apt update
+sudo apt install build-essential libncurses-dev dpkg-dev
 ```
 
-## Installation
+## Building From Source
 
 Clone the repository:
 
@@ -94,19 +102,19 @@ git clone https://github.com/FahimMuntasr/sudoku-solver.git
 cd sudoku-solver
 ```
 
-Compile the project:
+Build the program:
 
 ```bash
 make
 ```
 
-Run:
+Run it:
 
 ```bash
 ./sudoku
 ```
 
-You can also use the Makefile's run command if available:
+You can also build and run it with:
 
 ```bash
 make run
@@ -122,16 +130,15 @@ Current Sudoku:
 No sudoku created yet.
 
 1. Input Sudoku
-2. Generate Sudoku
-3. Solve Sudoku
-4. Exit
+2. Solve Sudoku
+3. Exit
 
 Choose an option:
 ```
 
 ### Input Sudoku
 
-Select option `1` and enter the Sudoku values from left to right and top to bottom.
+Select the input option and enter the Sudoku values from left to right and top to bottom.
 
 Use `0` for an empty cell.
 
@@ -149,19 +156,19 @@ Example:
 0 0 0 0 8 0 0 7 9
 ```
 
-### Generate Sudoku
-
-Select option `2` to generate a random Sudoku puzzle.
-
 ### Solve Sudoku
 
-Select option `3` to attempt to solve the current puzzle.
+Select the solve option to attempt to solve the current puzzle.
 
-The solution is displayed separately from the original puzzle.
+If the solver can determine all values, the completed Sudoku is displayed.
 
-## Example Output
+If no further deductions can be made, the program reports that the puzzle could not be solved using the implemented techniques.
+
+## Example
 
 ```text
+----------Sudoku Solver-------------
+Current Sudoku:
 -------------------------------
 | 5  3  0 | 0  7  0 | 0  0  0 |
 | 6  0  0 | 1  9  5 | 0  0  0 |
@@ -193,35 +200,68 @@ Solution:
 -------------------------------
 ```
 
+## Debian Package
+
+The project can be packaged as a Debian `.deb` package.
+
+Build the package with:
+
+```bash
+make package
+```
+
+This produces:
+
+```text
+sudoku-solver_1.0.0_amd64.deb
+```
+
+Install it with:
+
+```bash
+sudo apt install ./sudoku-solver_1.0.0_amd64.deb
+```
+
+After installation, the program can be launched from anywhere using:
+
+```bash
+sudoku
+```
+
+To uninstall:
+
+```bash
+sudo apt remove sudoku-solver
+```
+
 ## What I Learned
 
 This project was built to practice low-level programming and algorithmic problem solving in C.
 
 Key concepts explored:
 
-* Dynamic memory allocation
+* C structures
 * Pointers and pointer-to-pointer structures
-* Structures
-* Modular C programming
+* Dynamic memory allocation
+* Multi-file C projects
 * Header files
 * Makefiles
-* Sudoku constraint propagation
-* Backtracking
-* Randomized algorithms
-* CLI application design
+* Constraint propagation
+* Sudoku solving algorithms
+* Modular program design
+* Command-line interfaces
+* Linux development
+* Debian package creation
 * Debugging memory and logic errors
 
 ## Future Improvements
 
-Possible improvements include:
-
-* Implement full Sudoku backtracking in the solver
-* Guarantee a unique solution during puzzle generation
-* Add difficulty levels
-* Improve input validation
-* Add better error handling
-* Add puzzle statistics
-* Improve the terminal UI using `ncurses`
+* Implement recursive backtracking
+* Improve puzzle validation
+* Add stronger solving techniques
+* Improve input handling
 * Add automated tests
-* Improve memory cleanup and resource management
+* Improve memory management and cleanup
+* Improve the terminal interface using `ncurses`
+* Add difficulty analysis
 

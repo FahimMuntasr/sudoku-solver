@@ -36,7 +36,7 @@ void startUI(){
         printf("Not solvable\n");
       }
     }
-    printf("\n1. Input Sudoku\n2. Generate Sudoku\n3. Exit\nChoose an option:");
+    printf("\n1. Input Sudoku\n2. Solve Sudoku\n3. Exit\nChoose an option:");
     scanf("%d", &choice);
     
     switch (choice) {
@@ -47,12 +47,16 @@ void startUI(){
         isSolved = 0;
         break;
       case 2:
-        puzzle = generatePuzzle();
-        sudoku = setUpPuzzle(puzzle);
-        generated = 1;
-        isSolved = 0;
+        // Solve
+        if(generated){
+          solved = copySudoku(sudoku);
+          solvable = solve(solved);
+          isSolved = 1;
+        }else 
+          printf("Input a sudoku first.\n");
         break;
       case 3:
+        // exit 
         return;
       default:
         // invalid option 
