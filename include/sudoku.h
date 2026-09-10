@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 extern int SIZE_ROWS;
 extern int SIZE_COLUMNS;
@@ -12,6 +13,7 @@ typedef struct Sudoku{
   struct Square *** squares;
   struct Box ** boxes;
 } Sudoku;
+
 typedef struct Box{
   struct Square ** squares;
   int numbers;
@@ -31,7 +33,8 @@ typedef struct Square{
 } Square;
 
 int ** createPuzzle();
-void printPuzzle(Square *** puzzle);
+int ** generatePuzzle();
+void printPuzzle(Sudoku * sudoku);
 
 Sudoku * setUpPuzzle(int ** puzzle);
 Sudoku * createSudoku(Square *** puzzle, Box ** boxes);
@@ -44,4 +47,11 @@ void updateSudoku(Square *** sudoku, int row, int column);
 Box ** createBoxes();
 void updateBoxes(Square *** sudoku, int row, int column);
 int boxSingles(Square *** sudoku, Box ** boxes);
+
+int checkRows(Square *** sudoku, Box ** boxes);
+
+void startUI();
+int solve(Sudoku * sudoku);
+
+Sudoku * copySudoku(Sudoku * sudoku);
 #endif

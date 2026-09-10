@@ -10,6 +10,43 @@ Sudoku * createSudoku(Square *** squares, Box ** boxes){
   return sudoku;
 }
 
+Sudoku * copySudoku(Sudoku * original){
+  Square *** squares;
+  Box ** boxes;
+  Sudoku * copy;
+  int i, j, k;
+
+  squares = malloc(sizeof(Square **) * SIZE_ROWS);
+
+  for(i = 0; i < SIZE_ROWS; i++){
+    squares[i] = malloc(sizeof(Square *) * SIZE_COLUMNS);
+
+    for(j = 0; j < SIZE_COLUMNS; j++){
+      squares[i][j] = malloc(sizeof(Square));
+
+      *squares[i][j] = *original->squares[i][j];
+    }
+  }
+
+  boxes = createBoxes();
+
+  for(i = 0; i < SIZE_ROWS; i++){
+    for(j = 0; j < SIZE_COLUMNS; j++){
+      for(k = 0; k < 9; k++){
+        if(original->boxes[k] == original->squares[i][j]->box){
+          squares[i][j]->box = boxes[k];
+          break;
+        }
+      }
+    boxes[k]->squares[boxes[k]->numbers] = squares[i][j];
+    boxes[k]->numbers++;
+    }
+  }
+
+  copy = createSudoku(squares, boxes);
+  return copy;
+}
+
 Sudoku * setUpPuzzle(int ** puzzle){
   Square *** sudoku;
   Box ** boxes;
@@ -95,40 +132,135 @@ int checkPuzzle(Square *** sudoku, Box ** boxes){
     }
   }
 
-  return boxSingles(sudoku, boxes);
+  if(boxSingles(sudoku, boxes)){
+    return 1;
+  }
+  return checkRows(sudoku, boxes);
+}
+
+int isValid(int **puzzle, int row, int column, int number){
+  int i;
+  int boxRow;
+  int boxColumn;
+
+  for(i = 0; i < 9; i++){
+    if(puzzle[row][i] == number)
+      return 0;
+    if(puzzle[i][column] == number)
+      return 0;
+  }
+
+  boxRow = (row / 3) * 3;
+  boxColumn = (column / 3) * 3;
+
+  for(i = 0; i < 9; i++){
+    int r = boxRow + i / 3;
+    int c = boxColumn + i % 3;
+
+    if(puzzle[r][c] == number)
+      return 0;
+  }
+
+  return 1;
+}
+
+int fillPuzzle(int **puzzle, int row, int column){
+  int numbers[9];
+  int i, j, temp;
+  int nextRow;
+  int nextColumn;
+
+  if(row == 9)
+    return 1;
+
+  nextRow = row;
+  nextColumn = column + 1;
+
+  if(nextColumn == 9){
+    nextColumn = 0;
+    nextRow++;
+  }
+
+  for(i = 0; i < 9; i++)
+    numbers[i] = i + 1;
+
+  for(i = 8; i > 0; i--){
+    j = rand() % (i + 1);
+
+    temp = numbers[i];
+    numbers[i] = numbers[j];
+    numbers[j] = temp;
+  }
+
+  for(i = 0; i < 9; i++){
+    int number = numbers[i];
+
+    if(isValid(puzzle, row, column, number)){
+      puzzle[row][column] = number;
+
+      if(fillPuzzle(puzzle, nextRow, nextColumn))
+        return 1;
+
+      puzzle[row][column] = 0;
+     }
+  }
+
+  return 0;
+}
+
+int **generatePuzzle(){
+  int **puzzle;
+  int i, j;
+
+  puzzle = malloc(sizeof(int *) * 9);
+
+  for(i = 0; i < 9; i++){
+    puzzle[i] = malloc(sizeof(int) * 9);
+
+    for(j = 0; j < 9; j++)
+      puzzle[i][j] = 0;
+  }
+
+  fillPuzzle(puzzle, 0, 0);
+
+  /* Remove numbers */
+  for(i = 0; i < 9; i++){
+    for(j = 0; j < 9; j++){
+      if(rand() % 100 < 50)
+        puzzle[i][j] = 0;
+    }
+  }
+
+  return puzzle;
 }
 
 int ** createPuzzle(){
 
   int** puzzle;
   int i,j;
-  
-  int array[9][9] = {
-    0,1,9,   0,0,2,    0,0,0,
-    4,7,0,   6,9,0,    0,0,1,
-    0,0,0,   4,0,0,    0,9,0,
 
-    8,9,4,   5,0,7,    0,0,0,
-    0,0,0,   0,0,0,    0,0,0,
-    0,0,0,   2,0,1,    9,5,8,
-
-    0,5,0,   0,0,6,    0,0,0,
-    6,0,0,   0,2,8,    0,7,9,
-    0,0,0,   1,0,0,    8,6,0,
-  };
   puzzle = (int**)malloc(sizeof(int*)*9);
-  for(i=0; i<SIZE_ROWS; i++){
+  
+  printf("Enter sudoku numbers in left to right, top to bottom order:\n ");
+  for( i = 0; i < SIZE_ROWS; i++){
+    
     puzzle[i] = (int*)malloc(sizeof(int)*9);
-
-    for(j=0; j<SIZE_COLUMNS; j++){
-      puzzle[i][j] = array[i][j]; 
+       
+    for(j = 0; j < SIZE_COLUMNS; j++){
+      scanf("%d", &puzzle[i][j]);
     }
+
   }
+
   //printPuzzle(puzzle);
   return puzzle;
 }
 
-void printPuzzle(Square *** puzzle){
+void printPuzzle(Sudoku * sudoku){
+  
+  Square *** puzzle;
+  puzzle = sudoku->squares;
+  
   int i,j;
   printf("-------------------------------\n");
   for (i=0; i<SIZE_ROWS; i++){
@@ -145,4 +277,22 @@ void printPuzzle(Square *** puzzle){
   }
 
   printf("-------------------------------\n");
+}
+
+int solve(Sudoku * sudoku){
+  
+  int progress;
+  
+  while (UNSOLVED > 0) {
+
+    progress = checkPuzzle(sudoku->squares, sudoku->boxes);
+    
+    if(progress == 0){
+      return 0;
+    }
+  }
+  
+  if(UNSOLVED == 0){
+    return 1;
+  }
 }
