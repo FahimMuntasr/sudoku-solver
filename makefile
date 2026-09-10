@@ -1,17 +1,31 @@
 CC = gcc
-CFLAGS = -lncurses -I$(IDIR)
+CFLAGS = -Wall -Wextra -I./include/
+LDFLAGS = -lncurses
 
-IDIR = ./include/
-SRCDIR = ./src/
-SOURCES = $(SRCDIR)*.c
+TARGET = sudoku
+VERSION = 1.0.1
 
-all: sudoku run clean
+PACKAGE_DIR = packaging/sudoku-solver
+PACKAGE_BIN = $(PACKAGE_DIR)/usr/bin/sudoku
+DEB = sudoku-solver_$(VERSION)_amd64.deb
 
-sudoku:
-	$(CC) $(SOURCES) $(CFLAGS) -o $@
+.PHONY: all run package clean
 
-run:
-	./sudoku
+all: $(TARGET)
+
+$(TARGET):
+	$(CC) ./src/*.c $(CFLAGS) $(LDFLAGS) -o $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
+
+package: $(TARGET)
+	mkdir -p $(PACKAGE_DIR)/usr/bin
+	cp $(TARGET) $(PACKAGE_BIN)
+	dpkg-deb --build --root-owner-group $(PACKAGE_DIR)
+	mv $(PACKAGE_DIR).deb $(DEB)
+	@echo "Package created: $(DEB)"
 
 clean:
-	rm sudoku
+	rm -f $(TARGET)
+	rm -f $(DEB)

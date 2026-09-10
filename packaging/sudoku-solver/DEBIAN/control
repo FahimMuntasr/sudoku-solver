@@ -1,0 +1,8 @@
+Package: sudoku-solver
+Version: 1.0.1
+Section: games
+Priority: optional
+Architecture: amd64
+Maintainer: Fahim Muntasir
+Description: Command-line Sudoku solver and generator
+ A Sudoku solver and puzzle generator written from scratch in C.
